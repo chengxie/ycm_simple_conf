@@ -21,7 +21,7 @@
 " 3. This notice may not be removed or altered from any source distribution.
 
 function! s:set_ycm_simple_conf_abs_script()
-    if ! has("python")
+    if !has("python") && !has("python3")
         return
     endif
     python << EOF
