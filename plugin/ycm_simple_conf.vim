@@ -20,10 +20,7 @@
 "    misrepresented as being the original software.
 " 3. This notice may not be removed or altered from any source distribution.
 
-function! s:set_ycm_simple_conf_abs_script()
-    if !has("python") && !has("python3")
-        return
-    endif
+function! s:set_ycm_simple_conf_abs_script_python()
     python << EOF
 import vim
 import os
@@ -37,6 +34,30 @@ except Exception as e:
     pass
 vim.command('let s:ycm_simple_conf_abs_script = \"' + ret + '\"')
 EOF
+endfunction
+
+function! s:set_ycm_simple_conf_abs_script_python3()
+    python3 << EOF
+import vim
+import os
+try:
+    ret = ''
+    main_dir = vim.eval('s:ycm_simple_conf_dir')
+    script_dir = vim.eval('s:ycm_simple_conf_script_dir')
+    script = vim.eval('s:ycm_simple_conf_script')
+    ret = os.path.join(main_dir, os.path.join(script_dir, script))
+except Exception as e:
+    pass
+vim.command('let s:ycm_simple_conf_abs_script = \"' + ret + '\"')
+EOF
+endfunction
+
+function! s:set_ycm_simple_conf_abs_script()
+    if has("python")
+        call s:set_ycm_simple_conf_abs_script_python()
+    elseif has("python3")
+        call s:set_ycm_simple_conf_abs_script_python3()
+    endif
 endfunction
 
 let g:ycm_simple_conf_active =
