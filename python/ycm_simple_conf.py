@@ -125,7 +125,7 @@ class SimpleConf(object):
         try:
             devnull = open('/dev/null', 'r')
             err = subprocess.check_output(
-                ['cpp', '-x', self.m_project_type, '-v'],
+                ['sh', '-c', 'LC_ALL=en_US.UTF-8 cpp -x ' + self.m_project_type + ' -v'],
                 stdin=devnull,
                 stderr=subprocess.STDOUT
             )
@@ -133,7 +133,7 @@ class SimpleConf(object):
                 '#include \<\.{3}\>.*\:(.+)End of search list\.',
                 re.DOTALL
                 )
-            match = pattern.search(err)
+            match = pattern.search(err.decode())
             if match:
                 lines = str.splitlines(match.group(1))
                 for inc in [str.strip(l) for l in lines if l]:
