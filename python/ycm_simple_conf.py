@@ -125,7 +125,7 @@ class SimpleConf(object):
         try:
             devnull = open('/dev/null', 'r')
             err = subprocess.check_output(
-                ['sh', '-c', 'LC_ALL=en_US.UTF-8 cpp -x ' + self.m_project_type + ' -v'],
+                ['sh', '-c', 'LC_ALL=C cpp -x ' + self.m_project_type + ' -v'],
                 stdin=devnull,
                 stderr=subprocess.STDOUT
             )
