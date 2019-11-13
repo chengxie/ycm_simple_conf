@@ -35,7 +35,7 @@ class SimpleConf(object):
         self.m_root_dir = None
         self.m_config_file = None
         self.m_project_type = 'c++'
-        self.m_user_defines = list()
+        self.m_user_cxxflags = list()
         self.m_user_include_path = list()
         self.m_default_include_path = list()
         self.seek_config_file(os.path.dirname(self.m_compiled_file))
@@ -59,8 +59,8 @@ class SimpleConf(object):
         return self.m_project_type
 
     @property
-    def user_defines(self):
-        return self.m_user_defines
+    def user_cxxflags(self):
+        return self.m_user_cxxflags
 
     @property
     def user_include_path(self):
@@ -74,13 +74,13 @@ class SimpleConf(object):
     def flags(self):
         flags = ['-Wall']
         if self.m_project_type == 'c':
-            flags.extend(['-std=c99', '-x', 'c'])
+            flags.extend(['-x', 'c'])
         else:
-            flags.extend(['-std=c++11', '-x', 'c++'])
+            flags.extend(['-x', 'c++'])
         for include in self.m_default_include_path:
             flags.extend(['-isystem', include])
-        for define in self.m_user_defines:
-            flags.extend(['-D', define])
+        for f in self.m_user_cxxflags:
+            flags.extend([f])
         for include in self.m_user_include_path:
             flags.extend(['-I', include])
         return flags
@@ -92,7 +92,7 @@ class SimpleConf(object):
         files = [os.path.join(dir_name, f) for f in os.listdir(dir_name)]
         files = [f for f in files if os.path.isfile(f)]
         for f in files:
-            if os.path.basename(f) == '.ycm_simple_conf.xml':
+            if os.path.basename(f) == '.ycm.xml':
                 self.m_root_dir = dir_name
                 self.m_config_file = os.path.join(dir_name, f)
                 logging.info('Config file found: %s' % self.m_config_file)
@@ -109,15 +109,16 @@ class SimpleConf(object):
             self.m_project_type = project.attrib['type']
             if self.m_project_type not in ['c', 'c++']:
                 raise Exception
-            for define in project.iter('define'):
-                name = str.strip(define.attrib['name'])
-                self.m_user_defines.append(name)
-                logging.info('Adding to user defines: %s' % name)
+            for cxxflag in project.iter('cxxflag'):
+                name = str.strip(cxxflag.attrib['name'])
+                self.m_user_cxxflags.append(name)
+                logging.info('Adding to user cxxflag: %s' % name)
             for include in project.iter('include'):
                 inc = os.path.join(self.m_root_dir, include.attrib['path'])
                 inc = str.strip(inc)
                 self.m_user_include_path.append(inc)
                 logging.info('Adding to user include path: %s' % inc)
+            self.m_user_include_path.append(self.m_root_dir)
         except Exception as e:
             logging.error('Failed to parse config file: %s' % e.message)
 
